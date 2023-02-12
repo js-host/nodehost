@@ -3,11 +3,6 @@
 #ifndef NODEHOST_API_NODEPROCESS_H
 #define NODEHOST_API_NODEPROCESS_H
 
-#include "../config.h"
-
-#include <vector>
-#include <string>
-
 #include "./node_configuration.h"
 #include "./node_instance.h"
 
@@ -23,7 +18,7 @@ namespace nodehost {
             shutdown,
         };
 
-        class NODEHOST_API NodeProcess {
+        class NodeProcess {
             NodeProcess() = delete;
             ~NodeProcess() = delete;
 

@@ -3,12 +3,10 @@
 #ifndef NODEHOST_API_NODESCRIPT_H
 #define NODEHOST_API_NODESCRIPT_H
 
-#include "../config.h"
+#include "v8.h"
 
 #include <memory>
 #include <string>
-
-#include "../src/node.h"
 
 namespace nodehost {
     namespace api {
@@ -16,7 +14,7 @@ namespace nodehost {
         class NodeInstance;
         class NodeContext;
 
-        class NODEHOST_API NodeScript {
+        class NodeScript {
 
         public:
             NodeScript(NodeInstance* instance, NodeContext* context, const std::string& script_utf8);

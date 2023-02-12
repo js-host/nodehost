@@ -1,14 +1,14 @@
-#include <string>
-#include <thread>
-
-#include "../src/node.h"
-#include "../deps/uv/include/uv.h"
-
 #include "node_instance.h"
 
 #include "../internal/utils.h"
 #include "node_process.h"
 #include "node_error.h"
+
+#include "node.h"
+#include "uv.h"
+
+#include <string>
+#include <thread>
 
 //#define USE_EMBEDDING_API
 #define CHECK_DISPOSED PIMPL_CHECK_DISPOSED("node instance");

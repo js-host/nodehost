@@ -1,3 +1,4 @@
 # nodehost
 
-C api for hosting of nodejs within own processes. 
+C api for hosting nodejs within own processes.
+

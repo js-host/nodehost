@@ -17,8 +17,8 @@ function Load-Environment
             return;
         }
 
-        $existing_value = [System.Environment]::GetEnvironmentVariable($name)
-        if (-Not $existing_value -eq "") {
+        if (Test-Path "env:$name") {
+            $existing_value = [System.Environment]::GetEnvironmentVariable($name)
             Write-Host "    - $name=$value (skipped, current value=$existing_value)"
             return;
         }

@@ -3,12 +3,10 @@
 #ifndef NODEHOST_API_NODEVALUE_H
 #define NODEHOST_API_NODEVALUE_H
 
-#include "../config.h"
+#include "v8.h"
 
 #include <memory>
-#include <string>
-
-#include "../src/node.h"
+#include <math.h>
 
 namespace nodehost {
     namespace api {
@@ -31,7 +29,7 @@ namespace nodehost {
             NODEVALUETYPE_FUNCTION = 12,
         };
 
-        class NODEHOST_API NodeValue {
+        class NodeValue {
 
         public:
             NodeValue(NodeInstance* instance, NodeContext* context, v8::Global<v8::Value> value);

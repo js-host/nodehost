@@ -10,6 +10,12 @@ $node_path = Join-Path $libs_path 'node'
 "Patching node.."
 ""
 Exec-In-Folder $node_path {
+    git checkout 'node.gyp'
+}
+Exec-In-Folder $node_path {
+    git checkout 'vcbuild.bat'
+}
+Exec-In-Folder $node_path {
     git apply (Join-Path $patches_path 'node.gyp.patch')
 }
 Exec-In-Folder $node_path {

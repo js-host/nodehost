@@ -1,12 +1,11 @@
-#include "../src/node.h"
-#include "../deps/uv/include/uv.h"
-
 #include "node_context.h"
 
 #include "../internal/utils.h"
 #include "./node_error.h"
 #include "./node_instance.h"
 #include "./node_script.h"
+
+#include "node.h"
 
 #define CHECK_DISPOSED PIMPL_CHECK_DISPOSED("node context");
 

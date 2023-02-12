@@ -34,5 +34,11 @@ if (-Not $zip_name -ieq "") {
     Compress-Archive -Path (Join-Path $publish_path "*") -DestinationPath (Join-Path $publish_path $zip_name)
 
     # let github actions know the name of generated output file
-    Write-Output "::set-output name=zipname::$zip_name"
+    if (Test-Path "env:GITHUB_OUTPUT") {
+        "Writing output to $env:GITHUB_OUTPUT.."
+
+        "zipname=$zip_name" >> "$env:GITHUB_OUTPUT"
+    } else {
+        "Running outside of github actions"
+    }
 }

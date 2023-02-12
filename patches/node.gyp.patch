@@ -1,8 +1,8 @@
 diff --git a/node.gyp b/node.gyp
-index b0f132e..59fcde3 100644
+index b0f132e..6c87f87 100644
 --- a/node.gyp
 +++ b/node.gyp
-@@ -894,6 +894,126 @@
+@@ -894,6 +894,172 @@
          },
        ],
      }, # node_lib_target_name
@@ -11,13 +11,14 @@ index b0f132e..59fcde3 100644
 +      'type': 'shared_library',
 +      'dependencies': [
 +        '<(node_lib_target_name)',
++        'deps/histogram/histogram.gyp:histogram',
++        'deps/uvwasi/uvwasi.gyp:uvwasi',
 +      ],
 +      'includes': [
 +        'node.gypi'
 +      ],
 +      'include_dirs': [
 +        'src',
-+        'src-nodehost',
 +      ],
 +      'defines': [
 +        'NODE_ARCH="<(target_arch)"',
@@ -36,7 +37,6 @@ index b0f132e..59fcde3 100644
 +        'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',  # -fexceptions
 +      },
 +      'sources': [
-+        'src/node_snapshot_stub.cc',
 +        '../../src/nodehost/api/node_context.cpp',
 +        '../../src/nodehost/api/node_instance.cpp',
 +        '../../src/nodehost/api/node_process.cpp',
@@ -80,9 +80,6 @@ index b0f132e..59fcde3 100644
 +                '-Wl,--no-whole-archive',
 +              ],
 +            }],
-+            [ 'OS=="win"', {
-+              'sources': [ 'src/res/node.rc' ],
-+            }],
 +          ],
 +        }],
 +        ['OS=="win"', {
@@ -90,6 +87,55 @@ index b0f132e..59fcde3 100644
 +            'Dbghelp.lib',
 +            'winmm.lib',
 +            'Ws2_32.lib',
++          ],
++        }],
++        ['node_use_node_snapshot=="true"', {
++          'dependencies': [
++            'node_mksnapshot',
++          ],
++          'conditions': [
++            ['node_snapshot_main!=""', {
++              'actions': [
++                {
++                  'action_name': 'node_mksnapshot',
++                  'process_outputs_as_sources': 1,
++                  'inputs': [
++                    '<(node_mksnapshot_exec)',
++                    '<(node_snapshot_main)',
++                  ],
++                  'outputs': [
++                    '<(SHARED_INTERMEDIATE_DIR)/node_snapshot.cc',
++                  ],
++                  'action': [
++                    '<(node_mksnapshot_exec)',
++                    '--build-snapshot',
++                    '<(node_snapshot_main)',
++                    '<@(_outputs)',
++                  ],
++                },
++              ],
++            }, {
++              'actions': [
++                {
++                  'action_name': 'node_mksnapshot',
++                  'process_outputs_as_sources': 1,
++                  'inputs': [
++                    '<(node_mksnapshot_exec)',
++                  ],
++                  'outputs': [
++                    '<(SHARED_INTERMEDIATE_DIR)/node_snapshot.cc',
++                  ],
++                  'action': [
++                    '<@(_inputs)',
++                    '<@(_outputs)',
++                  ],
++                },
++              ],
++            }],
++          ],
++          }, {
++          'sources': [
++            'src/node_snapshot_stub.cc'
 +          ],
 +        }],
 +      ]

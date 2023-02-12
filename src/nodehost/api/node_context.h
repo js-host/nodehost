@@ -3,14 +3,12 @@
 #ifndef NODEHOST_API_NODECONTEXT_H
 #define NODEHOST_API_NODECONTEXT_H
 
-#include "../config.h"
+#include "./node_value.h"
+
+#include "node.h"
 
 #include <memory>
 #include <string>
-
-#include "../src/node.h"
-
-#include "./node_value.h"
 
 namespace nodehost {
     namespace api {
@@ -19,7 +17,7 @@ namespace nodehost {
         class NodeScript;
         class NodeValue;
 
-        class NODEHOST_API NodeContext {
+        class NodeContext {
 
         public:
             NodeContext(NodeInstance* instance);

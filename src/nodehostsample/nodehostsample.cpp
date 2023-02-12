@@ -1,11 +1,21 @@
-﻿#include <iostream>
-#include <vector>
-#include <thread>
+﻿#include "nodehostsample.h"
 
 #include "../nodehost/libnodehost.h"
 #include "../nodehost/internal/utils.h"
 
-#include "nodehostsample.h"
+#include <iostream>
+#include <vector>
+#include <thread>
+
+std::string nodehost_getlasterror()
+{
+    std::string s;
+    s.reserve(256);
+    
+    nodehost_getlasterror(&s.front(), 256);
+
+    return s;
+}
 
 int main(int argc, char** argv) {
 	int err = 0;

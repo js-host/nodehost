@@ -74,6 +74,7 @@ jobs:
         shell: pwsh
 
       - name: Publish
+        id: publish
         run: ./scripts/03-publish.ps1
         shell: pwsh
 
@@ -81,7 +82,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.publish.outputs.zipname }}
-          path: ${{ steps.publish.outputs.zipname }}
+          path: artifacts/${{ steps.publish.outputs.zipname }}
 
   gh_release:
     needs: build

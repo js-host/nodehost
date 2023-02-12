@@ -3,18 +3,16 @@
 #ifndef NODEHOST_API_NODEINSTANCE_H
 #define NODEHOST_API_NODEINSTANCE_H
 
-#include "../config.h"
+#include "node_context.h"
+
+#include "v8.h"
 
 #include <memory>
-
-#include "../deps/v8/include/v8.h"
-
-#include "node_context.h"
 
 namespace nodehost {
     namespace api {
 
-        class NODEHOST_API NodeInstance {
+        class NodeInstance {
 
         public:
             NodeInstance();

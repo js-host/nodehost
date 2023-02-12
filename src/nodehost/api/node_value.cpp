@@ -1,6 +1,3 @@
-#include "../src/node.h"
-#include "../deps/uv/include/uv.h"
-
 #include "./node_value.h"
 
 #include "../internal/utils.h"

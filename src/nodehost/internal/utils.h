@@ -3,11 +3,10 @@
 #ifndef NODEHOST_INTERNAL_UTILS_H
 #define NODEHOST_INTERNAL_UTILS_H
 
-#include "../config.h"
-
 #include <memory>
+#include <vector>
+#include <algorithm>
 #include <string>
-#include <stdexcept>
 
 #define PIMPL_CHECK_DISPOSED(name) if (this->disposed()) throw node_error("Attempt to access disposed " name)
 

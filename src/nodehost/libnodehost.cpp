@@ -1,21 +1,15 @@
-﻿#include <sstream>
-#include <iostream>
-#include <optional>
-#include <thread>
-#include <iostream>
-#include <chrono>
-#include <cuchar>
-
-#include "../src/node.h"
-#include "../deps/uv/include/uv.h"
-#include "../src/node_api.h"
+﻿#include "libnodehost.h"
 
 #include "./internal/utils.h"
 #include "./api/node_error.h"
 #include "./api/node_process.h"
 #include "./api/node_script.h"
 
-#include "libnodehost.h"
+#include <sstream>
+#include <optional>
+#include <chrono>
+
+#include "node.h"
 
 #define NODEHOST_SUCCESS 0
 #define NODEHOST_ERROR 1
@@ -23,7 +17,7 @@
 using namespace nodehost;
 using namespace nodehost::internal;
 
-std::optional<std::string> s_lasterror;
+std::optional<std::string> s_lasterror {};
 void nodehost_setlasterror(const std::string& error) {
     s_lasterror = error;
 }
@@ -35,13 +29,9 @@ void nodehost_setlasterror(const std::vector<std::string>& errors) {
     nodehost_setlasterror(ss.str());
 }
 
-std::string nodehost_getlasterror() {
-    return s_lasterror.has_value() ? s_lasterror.value().c_str() : "";
-}
-
-std::vector<std::shared_ptr<nodehost::api::NodeInstance>> s_instances;
-std::vector<std::shared_ptr<nodehost::api::NodeContext>> s_contexts;
-std::vector<std::shared_ptr<nodehost::api::NodeScript>> s_scripts;
+std::vector<std::shared_ptr<nodehost::api::NodeInstance>> s_instances {};
+std::vector<std::shared_ptr<nodehost::api::NodeContext>> s_contexts {};
+std::vector<std::shared_ptr<nodehost::api::NodeScript>> s_scripts {};
 
 #ifdef __cplusplus
 extern "C" {

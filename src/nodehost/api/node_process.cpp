@@ -1,13 +1,11 @@
-#include <mutex>
-#include <sstream>
-
-#include "../deps/uv/include/uv.h"
-#include "../src/node.h"
-#include "../src/node_api.h"
+#include "node_process.h"
 
 #include "node_error.h"
-#include "node_process.h"
 #include "../internal/utils.h"
+
+#include "node.h"
+
+#include <mutex>
 
 using namespace nodehost::api;
 using namespace nodehost::internal;

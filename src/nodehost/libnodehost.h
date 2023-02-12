@@ -5,6 +5,7 @@
 
 #include "./config.h"
 
+#include <stdint.h>
 #include <math.h>
 
 namespace nodehost {
@@ -15,8 +16,6 @@ namespace nodehost {
         class NodeValue;
     }
 }
-
-NODEHOST_API std::string nodehost_getlasterror();
 
 #ifdef __cplusplus
 extern "C" {
