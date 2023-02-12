@@ -5,6 +5,8 @@
 
 #include "./config.h"
 
+#include <math.h>
+
 namespace nodehost {
     namespace api {
         class NodeInstance;

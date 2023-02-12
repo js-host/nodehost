@@ -1,8 +1,8 @@
 diff --git a/node.gyp b/node.gyp
-index b0f132e..070cd61 100644
+index b0f132e..59fcde3 100644
 --- a/node.gyp
 +++ b/node.gyp
-@@ -894,6 +894,116 @@
+@@ -894,6 +894,126 @@
          },
        ],
      }, # node_lib_target_name
@@ -29,6 +29,11 @@ index b0f132e..070cd61 100644
 +        'VCCLCompilerTool': {
 +          'ExceptionHandling': 1, # /EHsc
 +        },
++      },
++      'cflags_cc!': ['-fno-exceptions'],
++      'cflags_cc': ['-fexceptions'],
++      'xcode_settings': {
++        'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',  # -fexceptions
 +      },
 +      'sources': [
 +        'src/node_snapshot_stub.cc',
@@ -109,6 +114,11 @@ index b0f132e..070cd61 100644
 +        'VCCLCompilerTool': {
 +          'ExceptionHandling': 1, # /EHsc
 +        },
++      },
++      'cflags_cc!': ['-fno-exceptions'],
++      'cflags_cc': ['-fexceptions'],
++      'xcode_settings': {
++        'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',  # -fexceptions
 +      },
 +      'sources': [
 +        '../../src/nodehostsample/nodehostsample.cpp',

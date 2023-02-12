@@ -4,11 +4,16 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Node.js version (ex. v19.6.0)"
+        description: "Library version (ex. 0.1.0)"
+        required: true
+      node_version:
+        description: "Node.js version (ex. 19.6.0)"
         required: true
 
 env:
-  NODE_VERSION: ${{ github.event.inputs.version }}
+  NODEHOST_VERSION: ${{ github.event.inputs.version }}
+  NODEHOST_NODE_VERSION: ${{ github.event.inputs.node_version }}
+  NODEHOST_CONFIGURATION: release
 
 jobs:
   build:
@@ -17,29 +22,23 @@ jobs:
       matrix:
         os: [macos-11, windows-2019, ubuntu-20.04]
         architecture: [x86, x64]
-        configuration: [release, debug]
         exclude:
           - os: macos-11
             architecture: x86
-          - os: macos-11
-            configuration: debug
           - os: ubuntu-20.04
             architecture: x86
-          - os: ubuntu-20.04
-            configuration: debug
     runs-on: ${{ matrix.os }}
     env:
-      LIBNODEHOST_ARCHITECTURE: ${{ matrix.architecture }}
-      LIBNODEHOST_CONFIGURATION: ${{ matrix.configuration }}
+      NODEHOST_ARCHITECTURE: ${{ matrix.architecture }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.10'
 
-      - name: Install nasm (windows only)
+      - name: Install nasm (windows)
         run: choco install -y nasm
         if: runner.os == 'Windows'
 
@@ -51,14 +50,46 @@ jobs:
         run: sudo apt-get install -y ninja-build
         if: runner.os == 'Linux'
 
-      - name: Initialize repository
-        run: ./scripts/01-initialize.ps1 -node_tag:${{ github.event.inputs.version }}
+      - name: Try restore built node from cache
+        uses: actions/cache/restore@v3
+        id: cache
+        with:
+          path: ./libs/node
+          key: ${{ runner.os }}-${{ env.NODEHOST_NODE_VERSION }}-${{ env.NODEHOST_ARCHITECTURE }}-${{ env.NODEHOST_CONFIGURATION }}
+
+      - name: Build node
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: ./scripts/01-build-node.ps1
         shell: pwsh
 
-      - name: Build
-        run: ./scripts/02-build.ps1 -configuration:${{ matrix.configuration }} -architecture:${{ matrix.architecture }}
+      - name: Save built node to cache
+        uses: actions/cache/save@v3
+        if: steps.cache.outputs.cache-hit != 'true'
+        with:
+          path: ./libs/node
+          key: ${{ runner.os }}-${{ env.NODEHOST_NODE_VERSION }}-${{ env.NODEHOST_ARCHITECTURE }}-${{ env.NODEHOST_CONFIGURATION }}
+
+      - name: Build nodehost
+        run: ./scripts/02-build-nodehost.ps1
         shell: pwsh
 
       - name: Publish
-        run: ./scripts/03-publish.ps1 -configuration:${{ matrix.configuration }}
+        run: ./scripts/03-publish.ps1
         shell: pwsh
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.publish.outputs.zipname }}
+          path: ${{ steps.publish.outputs.zipname }}
+
+  gh_release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "*.zip"
