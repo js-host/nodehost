@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Node.js version (ex. v19.6.0)"
+        required: true
+
+env:
+  NODE_VERSION: ${{ github.event.inputs.version }}
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-11, windows-2019, ubuntu-20.04]
+        architecture: [x86, x64]
+        configuration: [release, debug]
+        exclude:
+          - os: macos-11
+            architecture: x86
+          - os: macos-11
+            configuration: debug
+          - os: ubuntu-20.04
+            architecture: x86
+          - os: ubuntu-20.04
+            configuration: debug
+    runs-on: ${{ matrix.os }}
+    env:
+      LIBNODEHOST_ARCHITECTURE: ${{ matrix.architecture }}
+      LIBNODEHOST_CONFIGURATION: ${{ matrix.configuration }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install nasm (windows only)
+        run: choco install -y nasm
+        if: runner.os == 'Windows'
+
+      - name: Install ninja (macos)
+        run: HOMEBREW_NO_AUTO_UPDATE=1 brew install ninja
+        if: runner.os == 'macOS'
+
+      - name: Install ninja (linux)
+        run: sudo apt-get install -y ninja-build
+        if: runner.os == 'Linux'
+
+      - name: Initialize repository
+        run: ./scripts/01-initialize.ps1 -node_tag:${{ github.event.inputs.version }}
+        shell: pwsh
+
+      - name: Build
+        run: ./scripts/02-build.ps1 -configuration:${{ matrix.configuration }} -architecture:${{ matrix.architecture }}
+        shell: pwsh
+
+      - name: Publish
+        run: ./scripts/03-publish.ps1 -configuration:${{ matrix.configuration }}
+        shell: pwsh

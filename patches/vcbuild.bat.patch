@@ -1,0 +1,13 @@
+diff --git a/vcbuild.bat b/vcbuild.bat
+index dc9ff39..1318a75 100644
+--- a/vcbuild.bat
++++ b/vcbuild.bat
+@@ -26,7 +26,7 @@ set "common_test_suites=%JS_SUITES% %NATIVE_SUITES%&set build_addons=1&set build
+ 
+ @rem Process arguments.
+ set config=Release
+-set target=Build
++set target=nodehostsample
+ set target_arch=x64
+ set ltcg=
+ set target_env=
