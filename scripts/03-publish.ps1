@@ -12,10 +12,20 @@ if (Test-Path $publish_path) {
 }
 $null = New-Item $publish_path -ItemType directory
 
-Copy-Item (Join-Path $node_publish_path "libnodehost.dll") $publish_path
-Copy-Item (Join-Path $node_publish_path "libnodehost.pdb") $publish_path
-Copy-Item (Join-Path $node_publish_path "nodehostsample.exe") $publish_path
-Copy-Item (Join-Path $node_publish_path "nodehostsample.pdb") $publish_path
+if ($IsWindows) {
+    Copy-Item (Join-Path $node_publish_path "libnodehost.dll") $publish_path
+    Copy-Item (Join-Path $node_publish_path "libnodehost.pdb") $publish_path
+    Copy-Item (Join-Path $node_publish_path "nodehostsample.exe") $publish_path
+    Copy-Item (Join-Path $node_publish_path "nodehostsample.pdb") $publish_path
+}
+if ($IsLinux) {
+    Copy-Item (Join-Path $node_publish_path "libnodehost.so") $publish_path
+    Copy-Item (Join-Path $node_publish_path "nodehostsample") $publish_path
+}
+if ($IsMacOS) {
+    Copy-Item (Join-Path $node_publish_path "libnodehost.dylib") $publish_path
+    Copy-Item (Join-Path $node_publish_path "nodehostsample") $publish_path
+}
 
 $null = New-Item $publish_headers_path -ItemType directory
 Copy-Item (Join-Path $nodehost_src_path "config.h") $publish_headers_path
