@@ -26,11 +26,11 @@ Exec-In-Folder $node_path {
 "Building nodehost.."
 ""
 if ($IsWindows) {
-    $build_arguments = @()
+    $build_arguments = @('dll')
     if ($nodehost_configuration -ieq 'debug') {
         $build_arguments += 'debug';
     }
-    if ($architecture -ieq 'x64') {
+    if ($nodehost_architecture -ieq 'x64') {
         $build_arguments += $nodehost_architecture;
     }
 
@@ -39,7 +39,7 @@ if ($IsWindows) {
     }
 } else {
     Exec-In-Folder $node_path {
-        & ./configure
+        & ./configure --shared
     }
     Exec-In-Folder $node_path {
         make -j4

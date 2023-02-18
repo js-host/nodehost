@@ -17,9 +17,20 @@
 using namespace nodehost;
 using namespace nodehost::internal;
 
-std::optional<std::string> s_lasterror {};
+typedef struct _API_STATE
+{
+    std::optional<std::string> lasterror {};
+    
+    std::vector<std::shared_ptr<nodehost::api::NodeInstance>> instances {};
+    std::vector<std::shared_ptr<nodehost::api::NodeContext>> contexts {};
+    std::vector<std::shared_ptr<nodehost::api::NodeScript>> scripts {};
+    std::vector<std::shared_ptr<nodehost::api::NodeValue>> values {};
+} API_STATE;
+
+API_STATE s_nodehost_apistate {};
+
 void nodehost_setlasterror(const std::string& error) {
-    s_lasterror = error;
+    s_nodehost_apistate.lasterror = error;
 }
 void nodehost_setlasterror(const std::vector<std::string>& errors) {
     std::stringstream ss;
@@ -29,10 +40,6 @@ void nodehost_setlasterror(const std::vector<std::string>& errors) {
     nodehost_setlasterror(ss.str());
 }
 
-std::vector<std::shared_ptr<nodehost::api::NodeInstance>> s_instances {};
-std::vector<std::shared_ptr<nodehost::api::NodeContext>> s_contexts {};
-std::vector<std::shared_ptr<nodehost::api::NodeScript>> s_scripts {};
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,20 +47,19 @@ extern "C" {
     // utils
     void nodehost_setlasterror(const char* error) {
         if (error) {
-            s_lasterror = std::string(error);
-        }
-        else {
-            s_lasterror.reset();
+            nodehost_setlasterror(std::string(error));
+        } else {
+            s_nodehost_apistate.lasterror.reset();
         }
     }
     int nodehost_getlasterror(char* buffer_utf8, int32_t size) {
-        auto hasError = s_lasterror.has_value();
+        auto hasError = s_nodehost_apistate.lasterror.has_value();
 
         if (size <= 0 || !hasError) {
-            return hasError ? s_lasterror.value().size() : 0;
+            return hasError ? s_nodehost_apistate.lasterror.value().size() : 0;
         }
 
-        const auto& error = s_lasterror.value();
+        const auto& error = s_nodehost_apistate.lasterror.value();
         return error.copy(buffer_utf8, size);
     }
 
@@ -90,7 +96,7 @@ extern "C" {
         try {
             auto ptr = nodehost::api::NodeProcess::create_instance();
 
-            s_instances.push_back(ptr);
+            s_nodehost_apistate.instances.push_back(ptr);
 
             *out_instance = ptr.get();
 
@@ -129,9 +135,9 @@ extern "C" {
         try {
             instance->dispose();
 
-            s_instances.erase(
-                std::remove_if(s_instances.begin(), s_instances.end(), [instance](std::shared_ptr<nodehost::api::NodeInstance>& ptr) { return ptr.get() == instance; }),
-                s_instances.end()
+            s_nodehost_apistate.instances.erase(
+                std::remove_if(s_nodehost_apistate.instances.begin(), s_nodehost_apistate.instances.end(), [instance](std::shared_ptr<nodehost::api::NodeInstance>& ptr) { return ptr.get() == instance; }),
+                s_nodehost_apistate.instances.end()
             );
             return NODEHOST_SUCCESS;
         }
@@ -179,6 +185,30 @@ extern "C" {
         }
     }
 
+    int32_t nodehost_context__evaluate(nodehost::api::NodeContext* context, nodehost::api::NodeScript* script) {
+        try {
+            auto value = context->evaluate(*script);
+
+            return NODEHOST_SUCCESS;
+        }
+        catch (const nodehost::api::node_error& err) {
+            nodehost_setlasterror(err.what());
+            return NODEHOST_ERROR;
+        }
+    }
+
+    int32_t nodehost_context__evaluate_string(nodehost::api::NodeContext* context, const char* script_utf8) {
+        try {
+            auto value = context->evaluate(script_utf8);
+            
+            return NODEHOST_SUCCESS;
+        }
+        catch (const nodehost::api::node_error& err) {
+            nodehost_setlasterror(err.what());
+            return NODEHOST_ERROR;
+        }
+    }
+    
     // int32_t nodehost_context__dispose(nodehost::api::NodeContext* context) {
     //     try {
     //         context->dispose();
@@ -200,7 +230,7 @@ extern "C" {
         try {
             auto script = context->compile(script_utf8);
 
-            s_scripts.push_back(script);
+            s_nodehost_apistate.scripts.push_back(script);
 
             *out_script = script.get();
             return NODEHOST_SUCCESS;
@@ -215,9 +245,9 @@ extern "C" {
         try {
             script->dispose();
 
-            s_scripts.erase(
-                std::remove_if(s_scripts.begin(), s_scripts.end(), [script](std::shared_ptr<nodehost::api::NodeScript>& ptr) { return ptr.get() == script; }),
-                s_scripts.end()
+            s_nodehost_apistate.scripts.erase(
+                std::remove_if(s_nodehost_apistate.scripts.begin(), s_nodehost_apistate.scripts.end(), [script](std::shared_ptr<nodehost::api::NodeScript>& ptr) { return ptr.get() == script; }),
+                s_nodehost_apistate.scripts.end()
             );
             return NODEHOST_SUCCESS;
         }

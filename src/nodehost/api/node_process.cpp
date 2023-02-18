@@ -10,12 +10,12 @@
 using namespace nodehost::api;
 using namespace nodehost::internal;
 
-std::mutex s_mutex;
+std::mutex s_mutex {};
 std::atomic<NodeProcessState> s_state{ NodeProcessState::idle };
-NodeConfiguration s_configuration;
-std::unique_ptr<node::MultiIsolatePlatform> s_platform{ nullptr };
+NodeConfiguration s_configuration {};
+std::unique_ptr<node::MultiIsolatePlatform> s_platform { nullptr };
 
-std::vector<std::weak_ptr<NodeInstance>> s_instances;
+std::vector<std::weak_ptr<NodeInstance>> s_instances2 {};
 
 void NodeProcess::startup(const NodeConfiguration& configuration) {
     std::lock_guard guard(s_mutex);
@@ -55,11 +55,11 @@ node::MultiIsolatePlatform* NodeProcess::platform() {
 std::shared_ptr<NodeInstance> NodeProcess::create_instance() {
     std::lock_guard guard(s_mutex);
 
-    gc_weak_ptr_vector(s_instances);
+    gc_weak_ptr_vector(s_instances2);
 
     auto instance = std::make_shared<NodeInstance>();
 
-    s_instances.push_back(std::weak_ptr<NodeInstance>{ instance });
+    s_instances2.push_back(std::weak_ptr<NodeInstance>{ instance });
 
     return instance;
 }
@@ -72,10 +72,10 @@ void NodeProcess::shutdown() {
         return;
     }
 
-    gc_weak_ptr_vector(s_instances);
+    gc_weak_ptr_vector(s_instances2);
 
-    if (s_instances.size() > 0) {
-        throw node_error(string_format("Cannot shutdown node when %d instances are still running.", s_instances.size()));
+    if (s_instances2.size() > 0) {
+        throw node_error(string_format("Cannot shutdown node when %d instances are still running.", s_instances2.size()));
     }
 
     v8::V8::Dispose();
