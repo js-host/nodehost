@@ -87,20 +87,28 @@ jobs:
   gh_release:
     needs: build
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - name: Create tag
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         with:
           script: |
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: 'refs/tags/v${{ env.NODEHOST_NODE_VERSION }}-node_v${{ env.NODE_VERSION }}',
+              ref: 'refs/tags/v${{ env.NODEHOST_VERSION }}-node_v${{ env.NODEHOST_NODE_VERSION }}',
               sha: context.sha
             })
       - name: Download artifacts
         uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+      - name: List downloaded artifacts
+        run: |
+          ls -la artifacts
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
-          files: "*.zip"
+          tag_name: v${{ env.NODEHOST_VERSION }}-node_v${{ env.NODEHOST_NODE_VERSION }}
+          files: |
+            artifacts/*/*.zip
