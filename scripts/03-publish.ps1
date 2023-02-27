@@ -21,12 +21,12 @@ if ($IsWindows) {
     Copy-Item (Join-Path $node_publish_path "nodehostsample.pdb") $publish_path
 }
 if ($IsLinux) {
-    Copy-Item (Join-Path $node_publish_path "libnode.so") $publish_path
+    Copy-Item (Join-Path $node_publish_path "libnode.so.111") $publish_path
     Copy-Item (Join-Path $node_publish_path "libnodehost.so") $publish_path
     Copy-Item (Join-Path $node_publish_path "nodehostsample") $publish_path
 }
 if ($IsMacOS) {
-    Copy-Item (Join-Path $node_publish_path "libnode.dylib") $publish_path
+    Copy-Item (Join-Path $node_publish_path "libnode.111.dylib") $publish_path
     Copy-Item (Join-Path $node_publish_path "libnodehost.dylib") $publish_path
     Copy-Item (Join-Path $node_publish_path "nodehostsample") $publish_path
 }
